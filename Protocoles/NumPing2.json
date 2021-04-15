@@ -1,0 +1,100 @@
+{
+  "pinger": {
+    "initiates": true,
+    "in_transition": [
+      "p.input_number('x')",
+      "p.input_var('a', 'ouep05@uqo.ca')"
+    ],
+    "states": {
+      "initial": {
+        "initial": true,
+        "final": false,
+        "transitions": [
+          {
+            "condition": "true",
+            "actions": [
+              "p.send(p.key('a'), ('ping', p.key('x')))"
+            ],
+            "next_state": "waitPong"
+          }
+        ]
+      },
+      "waitPong": {
+        "initial": false,
+        "final": false,
+        "transitions": [
+          {
+            "condition": "p.receive('a', 'ouep05@uqo.ca', {'m': 'pong', 'y': 6}) and p.equal(p.key('m'), 'pong') and p.equal(p.key('x')+1, p.key('y'))",
+            "actions": [
+              "p.send(p.key('a'), 'happy')"
+            ],
+            "next_state": "success"
+          },
+          {
+            "condition": "p.receive('a', 'ouep05@uqo.ca', {'m': 'pong', 'y': 6}) and p.equal(p.key('m'), 'pong') and not p.equal(p.key('x')+1, p.key('y'))",
+            "actions": [
+              "p.send(p.key('a'), 'unhappy')"
+            ],
+            "next_state": "failure"
+          }
+        ]
+      },
+      "failure": {
+        "initial": false,
+        "final": true,
+        "transitions": null
+      },
+      "success": {
+        "initial": false,
+        "final": true,
+        "transitions": null
+      }
+    }
+  },
+  "ponger": {
+    "initiates": false,
+    "in_transition": null,
+    "states": {
+      "waitPing": {
+        "initial": true,
+        "final": false,
+        "transitions": [
+          {
+            "condition": "p.receive('a', 'test@uqo.ca', {'m': 'ping', 'x': 5}) and p.equal(p.key('m'), 'ping')",
+            "actions": [
+              "p.input_number('y', str(p.key('x')) + ' received')",
+              "p.send(p.key('a'), ('pong', p.key('y')))"
+            ],
+            "next_state": "ponged"
+          }
+        ]
+      },
+      "ponged": {
+        "initial": false,
+        "final": false,
+        "transitions": [
+          {
+            "condition": "p.receive('a', 'test@uqo.ca', {'m': 'happy'}) and p.equal(p.key('m'), 'happy')",
+            "actions": [],
+            "next_state": "success"
+          },
+          {
+            "condition": "p.receive('a', 'test@uqo.ca', {'m': 'happy'}) and p.equal(p.key('m'), 'unhappy')",
+            "actions": [],
+            "next_state": "failure"
+          }
+        ]
+      },
+      "failure": {
+        "initial": false,
+        "final": true,
+        "transitions": null
+      },
+      "success": {
+        "initial": false,
+        "final": true,
+        "transitions": null
+      }
+    }
+  }
+}
